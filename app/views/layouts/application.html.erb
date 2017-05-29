@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ResenseBidder</title>
+    <%= csrf_meta_tags %>
+
+    <%= stylesheet_link_tag    'application', media: 'all' %>
+    <%= javascript_include_tag 'application' %>
+  </head>
+
+  <body>
+
+  <header>
+
+  	<h1 class='logo'>RESENSE</h1>
+  	<nav>
+  		<a href="#">Carteira de Mídia</a>
+  		<a class="active" href="#">Leilão digital</a>
+  	</nav>
+
+  	<div id="loggedInUserBox"><%= @user.name%> </div>
+
+  </header>
+
+    <%= yield %>
+    
+  </body>
+</html>

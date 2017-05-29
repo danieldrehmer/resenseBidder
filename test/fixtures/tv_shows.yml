@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  airtime: 2017-05-17 00:23:17
+  cpm: 9.99
+
+two:
+  name: MyString
+  airtime: 2017-05-17 00:23:17
+  cpm: 9.99

@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  airtime: 2017-05-17 00:26:03
+  purchased_cpm: 9.99
+  tv_show_id: 1
+  wallet_id: 1
+
+two:
+  name: MyString
+  airtime: 2017-05-17 00:26:03
+  purchased_cpm: 9.99
+  tv_show_id: 1
+  wallet_id: 1

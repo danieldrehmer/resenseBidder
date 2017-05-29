@@ -1,0 +1,325 @@
+<script type="text/javascript"> var jsTvShows = <%= raw @showsJson%> </script>
+
+
+<h2 class="sectionTitle">Leilão digital</h2>
+
+
+
+<aside id="asideInfoPannel">
+  
+  <div class="pannelContainer">
+    <span id="timeCounter" class="counter">01:00:00</span>
+
+    <h5>Contagem Regressiva</h5>
+
+  </div>
+
+  <div class="pannelContainer">
+  <span id="participantsCounter" class="counter">00</span>
+
+    <h5>Participantes</h5>
+  </div>
+
+  <div class="pannelContainer">
+    <span id="bidsCounter" class="counter">0</span>
+    <h5>Lances</h5>
+  </div>
+
+</aside>
+
+<style type="text/css">
+  
+aside#asideInfoPannel{
+  font-family: 'Roboto Mono', monospace;
+
+  width:700px;
+  border:1px solid black;
+  position:absolute;
+  top:52px;
+  margin: auto;
+  left:25%;
+  z-index:100;
+}
+
+aside#asideInfoPannel .pannelContainer{
+  width:200px;
+  height:100px;
+  background-color: white;
+  z-index:100;
+  position:relative;
+  margin-left:20px;
+  float:left;
+}
+
+aside#asideInfoPannel .pannelContainer h5{
+  position:absolute;
+  bottom:0;
+  margin:0;
+  width:100%;
+  text-align:center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  background-color: #e2ee79;
+
+}
+
+aside#asideInfoPannel .pannelContainer span{
+  width:100%;
+  height:100%;
+  text-align: center;
+  line-height: 100px;
+  display:block;
+  font-size:20px;
+}
+
+</style>
+
+
+
+<section id="section_01" class="auctionSection">
+	
+  <h3>Ofertas de Amanhã</h3>
+
+
+  <table style="undefined;table-layout: auto; width:100%">
+    <colgroup>
+
+    </colgroup>
+    <tr class="tableHeader">
+      <th style="width:200px">Programa</th>
+      <th style="width:100px">Horário</th>
+      <th style="width:100px">CPM Normal</th>
+      <th style="width:100px">Lance Mínimo</th>
+      <th style="width:100px">Dar lance</th>
+    </tr>
+
+
+    <% coin = "zebra" %>
+    <%@shows.each do |show|%>
+
+      <tr id="showRow_<%=show.id%>" class="<%= if coin == 'notZebra'; coin = 'zebra'; else; coin = 'notZebra'; end%>" data-id="<%=show.id%>">
+        <td><%= show.name %></td>
+        <td><%= "" + show.airtime[:start][0].to_s + ":" + show.airtime[:start][1].to_s %></td>
+        <td><%= number_to_currency(show.cpm) %></td>
+        <td class="minBid" data-val="<%=show.winning_bid1%>"> <%= number_to_currency(show.winning_bid1) %></td>
+        <td><div id="bidOn_<%=show.id%>" class="initialBidButton">Lance Inicial</div></td>
+      </tr>
+
+    <% end %>
+  </table>
+
+</section>
+
+<section id="section_02" class="auctionSection">
+    <h3>Acompanhe seus Lances</h3>
+
+    <div id="meuLanceTemplate" class="meuLanceContainer" data-user-id="${user_id}">
+      <div class="meuLanceBidButton">Aumentar seu lance</div>
+
+      <h4>Primeiro Impacto</h4>
+
+      <div class="meuLanceUltimoLance meuLanceInfoContainer">
+        <h5> Último Lance </h5>
+        <p class="positiveValue">R$ ${last_bid} </p>
+      </div>
+
+      <div class="meuLanceSeuLance meuLanceInfoContainer">
+        <h5> Seu Lance </h5>
+        <p class="positiveValue">R$ ${last_user_bid}</p>
+      </div>
+
+      <div class="meuLanceUltimoLance meuLanceInfoContainer meuLanceLast">
+        <h5> Status </h5>
+        <p class="positiveValue"> Vencendo </p>
+      </div>
+
+    </div>
+
+
+
+
+
+</section>  
+
+  <style type="text/css">
+    #meuLanceTemplate {
+      display:none;
+    }
+
+    section.auctionSection .meuLanceContainer{
+      width:100%;
+      height:100px;
+      border:1px solid black;
+      position:relative;
+      margin-bottom:30px;
+    }
+
+    section.auctionSection .meuLanceContainer h4{
+      background-color: #9c29b7;
+      color:white;
+      text-align: left;
+      margin:0;
+    }
+
+    section.auctionSection .meuLanceInfoContainer{
+      float:left;
+      border-right: 1px solid black;
+      width:32.88%;
+      height:80px;
+    }
+
+    section.auctionSection .meuLanceBidButton{
+      position:absolute;
+      right:5px;
+      top:-10px;
+      background-color: black;
+      color:white;
+      cursor:pointer;
+    }
+
+
+    section.auctionSection .meuLanceInfoContainer h5{
+      margin:0;
+      padding: 3px;
+
+    }
+
+    section.auctionSection .meuLanceInfoContainer p{
+      margin:0;
+    }
+
+    section.auctionSection .meuLanceLast{
+      float:right !important;
+      border:0 !important;
+    }
+
+  </style>
+
+
+<script type="text/javascript">
+
+if (localStorage.getItem("usrShows") == null) {
+  var g_usrShows = [];
+  localStorage.setItem("usrShows", JSON.stringify(g_usrShows));
+} else {
+  var g_usrShows =  JSON.parse(localStorage.getItem("usrShows"));
+}
+
+
+
+window.onload = init();
+
+function init(){
+  var initialBidButtons = document.querySelectorAll(".initialBidButton");
+
+  initialBidButtons.forEach(function(el){ 
+    el.addEventListener('click', function(){
+      App.auction.bid(el.id.replace("bidOn_",""), <%= session["current_user_id"]%>);
+    })
+  });
+
+  g_usrShows.forEach(function(usrShow){
+    instantiateMeuLance(usrShow);
+  });
+
+
+};
+
+
+function bidUpdate(data){
+
+  // Atualiza o json jsTvShows, que contém dados de todos os programas
+  // e reflete o modelo TvShow do servidor
+
+  jsTvShows[data["show_id"]].bids_counter = jsTvShows[data["show_id"]].bids_counter + 1;
+
+  jsTvShows[data["show_id"]].winning_bid1 = data["winning_bid1"];
+
+  jsTvShows[data["show_id"]].winning_bid2 = data["winning_bid2"];
+
+  jsTvShows[data["show_id"]].winner1 = data["winner1"];
+
+  jsTvShows[data["show_id"]].winner2 = data["winner2"];
+
+  // Atualiza os atributos na tabela "Ofertas de amanhã" na página
+
+  var mainEl = document.querySelector("#showRow_"+data["show_id"]);
+
+  mainEl.querySelector(".minBid").setAttribute("data-val", data["winning_bid1"]);
+
+  mainEl.querySelector(".minBid").textContent = "$"+data["winning_bid1"].toPrecision(3);
+
+
+  
+  if (g_usrShows.includes(data["show_id"])){} else {
+  
+    // Inclui show_id pra lista de ids globais do usuário, caso ainda não tenha sido
+    // daí o sistema sabe se o usuário já deu lance nesse programa ou não
+
+    if (data["user_id"] == <%= session["current_user_id"]%>){
+
+    g_usrShows.push(data["show_id"]);
+    localStorage.setItem("usrShows", JSON.stringify(g_usrShows));
+
+    // Nesse caso o id acaba de ser incluido, e é a primeira vez que esse usuário
+    // faz um lance nesse programa
+
+    // Portanto ele irá instanciar um elemento "Meu Lance" baseado no show_id
+
+     instantiateMeuLance(data["show_id"]);
+
+    }
+  };  
+
+  // Atualiza os atributos da caixa do programa na seção "Acompanhe seus lances"
+  var meuLance = document.querySelector("#meuLance_"+data["show_id"])
+  meuLance.querySelector(".meuLanceUltimoLance").querySelector("p").textContent = "R$"+data["winning_bid1"].toPrecision(3);
+
+  if (data["user_id"] == <%= session["current_user_id"]%>){
+    meuLance.querySelector(".meuLanceSeuLance").querySelector("p").textContent = "R$"+data["winning_bid1"].toPrecision(3);
+  };
+
+    meuLance.querySelector(".meuLanceStatus").querySelector("p").textContent = returnStatus(data["show_id"]);
+
+
+
+}
+
+  function reload(){
+    localStorage.clear();
+    location.reload();
+  }
+
+  function instantiateMeuLance(show_id){
+
+
+    var template = `<div id="meuLance_${show_id}" class="meuLanceContainer"> <div class="meuLanceBidButton">Aumentar seu lance</div> <h4>${ jsTvShows[show_id].name}</h4> <div class="meuLanceUltimoLance meuLanceInfoContainer"> <h5> Último Lance </h5> <p class="positiveValue">R$ ${parseFloat(jsTvShows[show_id].winning_bid1).toPrecision(3)} </p> </div> <div class="meuLanceSeuLance meuLanceInfoContainer"> <h5> Seu Lance </h5> <p class="positiveValue">R$ ${parseFloat(jsTvShows[show_id].winning_bid1).toPrecision(3) }</p> </div> <div class="meuLanceStatus meuLanceInfoContainer meuLanceLast"> <h5> Status </h5> <p class="positiveValue"> ${ returnStatus(show_id) } </p> </div> </div>`
+  
+    element = document.querySelector("#section_02");
+
+    element.insertAdjacentHTML('beforeend', template);
+
+    document.querySelector("#meuLance_"+show_id).querySelector(".meuLanceBidButton").addEventListener('click', function(){
+      App.auction.bid(show_id, <%= session["current_user_id"]%>)
+    });
+  }
+
+  function returnStatus(current_bid){
+
+    var status = "unknown";
+
+    if (jsTvShows[current_bid].winner1 == <%= session["current_user_id"] %> ){
+      status = "Primeiro Lugar"
+    } else if (jsTvShows[current_bid].winner2 == <%= session["current_user_id"]%> ) {
+      status = "Segundo Lugar"
+    } else {
+      status = "Cubra o lance ou irá perder"
+    }
+
+    return status;
+  }
+
+</script>
+
+<%= raw session.keys %>

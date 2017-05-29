@@ -1,0 +1,116 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono:300,400');
+
+
+body {
+	padding:0;
+	margin:0;
+	font-family: 'Roboto', sans-serif;
+}
+
+header {
+	background: #631878;
+	color:white;
+	height:40px;
+}
+
+header a{
+	color:white;
+	text-decoration:none;
+}
+
+header h1{
+	border-right:3px solid #7e2199;
+	margin: 0;
+	float:left;
+	padding-left:10px;
+	padding-right:20px;
+	margin-right:20px;
+}
+
+header nav	{
+	float:left;
+}
+
+header nav a{
+	padding:10px;
+	line-height:40px;
+}
+
+header nav a.active{
+	background-color: #783B8B;
+}
+
+header #loggedInUserBox{
+	float:right;
+	margin-right:20px;
+	line-height:40px;
+}
+
+h2.sectionTitle{
+	margin: 0;
+	background-color: #7e2199;
+	color:white;
+	font-weight: 300;
+	font-size:2em;
+	padding-left: 10px;
+	height:80px;
+	line-height: 80px;
+}
+
+section.auctionSection{
+	border:1px solid black;
+	width:40%;
+	height:500px !important;
+	overflow-y: scroll;
+	float:left;
+}
+
+section.auctionSection h3{
+	font-weight: 300;
+	font-size:2em;
+	text-align: center;
+}
+
+section.auctionSection table, tr, th, td, colgroup{
+	border:0px solid black;
+	text-align:left;
+}
+
+section.auctionSection tr{
+	height:50px;
+}
+
+section.auctionSection .zebra{
+	border: 0px;
+	background-color: #eee
+}
+
+section.auctionSection .tableHeader{
+	border: 0px;
+	background-color: #ccc;
+}
+
+section.auctionSection .initialBidButton{
+	cursor:pointer;
+	background-color: #4eb2f0;
+	color:white;
+	border-radius: 10px;
+	text-align:center;
+}
+
