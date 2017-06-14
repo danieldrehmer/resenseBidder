@@ -14,11 +14,5 @@ App.auction = App.cable.subscriptions.create "AuctionChannel",
     else
       bidUpdate(data["message"])
 
-    #console.log data
-
-
-  timesync: ->
-    @perform 'timesync'
-
   bid: (showId, user_id)->
     @perform 'bid', message: {"show_id": showId, "user_id": user_id}

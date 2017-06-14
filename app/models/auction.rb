@@ -6,6 +6,7 @@ class Auction < ApplicationRecord
     a = Auction.first
 
     a.active_users = []
+
     a.save
 
     Auction.soft_reset
@@ -16,6 +17,10 @@ class Auction < ApplicationRecord
   	a = Auction.first
 
   	a.bid_counter = 0
+
+    a.start_time = nil
+
+    a.save
 
   	TvShow.reset_all
 

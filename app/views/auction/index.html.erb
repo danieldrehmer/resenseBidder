@@ -8,20 +8,21 @@
 <aside id="asideInfoPannel">
   
   <div class="pannelContainer">
-    <span id="timeCounter" class="counter">01:00:00</span>
+    <span id="timeCounter" class="counter"><%= Time.at(((@auction.start_time + @auction.duration) - Time.now).to_i).utc.strftime("%H:%M:%S") %></span>
+
 
     <h5>Contagem Regressiva</h5>
 
   </div>
 
   <div class="pannelContainer">
-  <span id="participantsCounter" class="counter">00</span>
+  <span id="participantsCounter" class="counter"><%= @auction.active_users.size %></span>
 
     <h5>Participantes</h5>
   </div>
 
   <div class="pannelContainer">
-    <span id="bidsCounter" class="counter">0</span>
+    <span id="bidsCounter" class="counter"><%= @auction.bid_counter %></span>
     <h5>Lances</h5>
   </div>
 
@@ -33,7 +34,6 @@ aside#asideInfoPannel{
   font-family: 'Roboto Mono', monospace;
 
   width:700px;
-  border:1px solid black;
   position:absolute;
   top:52px;
   margin: auto;
@@ -42,14 +42,20 @@ aside#asideInfoPannel{
 }
 
 aside#asideInfoPannel .pannelContainer{
-  width:200px;
+  width:170px;
   height:100px;
   background-color: white;
   z-index:100;
   position:relative;
-  margin-left:20px;
+  margin-left:28px;
   float:left;
+  box-shadow:  4px 4px 4px rgba(0, 0, 0, .3);
 }
+
+aside#asideInfoPannel .pannelContainer:first-child{
+  width:200px !important;
+}
+
 
 aside#asideInfoPannel .pannelContainer h5{
   position:absolute;
@@ -66,11 +72,13 @@ aside#asideInfoPannel .pannelContainer h5{
 
 aside#asideInfoPannel .pannelContainer span{
   width:100%;
-  height:100%;
+  height:80%;
   text-align: center;
-  line-height: 100px;
+  line-height: 86px;
   display:block;
-  font-size:20px;
+  font-size:30px;
+  position:relative;
+  top:0;
 }
 
 </style>
@@ -89,8 +97,8 @@ aside#asideInfoPannel .pannelContainer span{
     <tr class="tableHeader">
       <th style="width:200px">Programa</th>
       <th style="width:100px">Horário</th>
-      <th style="width:100px">CPM Normal</th>
-      <th style="width:100px">Lance Mínimo</th>
+      <th style="width:100px">CPM descontado</th>
+      <th style="width:100px">Lance mínimo</th>
       <th style="width:100px">Dar lance</th>
     </tr>
 
@@ -147,24 +155,33 @@ aside#asideInfoPannel .pannelContainer span{
       display:none;
     }
 
+    section.auctionSection{
+
+    }
+
     section.auctionSection .meuLanceContainer{
-      width:100%;
-      height:100px;
-      border:1px solid black;
+      width:90%;
+      height:110px;
       position:relative;
       margin-bottom:30px;
+      box-shadow:  4px 4px 2px rgba(0, 0, 0, .3);
+
     }
 
     section.auctionSection .meuLanceContainer h4{
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight:300;
+      font-size: 22px;
       background-color: #9c29b7;
       color:white;
       text-align: left;
       margin:0;
+      padding-left:3px;
     }
 
     section.auctionSection .meuLanceInfoContainer{
       float:left;
-      border-right: 1px solid black;
+      border-right: 1px solid #ccc;
       width:32.88%;
       height:80px;
     }
@@ -180,13 +197,18 @@ aside#asideInfoPannel .pannelContainer span{
 
 
     section.auctionSection .meuLanceInfoContainer h5{
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight:300;
+      font-size: 20px;
       margin:0;
       padding: 3px;
+      padding-top:6px;
 
     }
 
     section.auctionSection .meuLanceInfoContainer p{
       margin:0;
+      padding:3px;
     }
 
     section.auctionSection .meuLanceLast{
@@ -211,6 +233,9 @@ if (localStorage.getItem("usrShows") == null) {
 window.onload = init();
 
 function init(){
+  
+  App.participants.new_participant();
+
   var initialBidButtons = document.querySelectorAll(".initialBidButton");
 
   initialBidButtons.forEach(function(el){ 
@@ -224,10 +249,44 @@ function init(){
   });
 
 
+  // Eu suponho que cachear o ponteiro pra esse elemento como variavel global
+  // seja melhor do que fazer a query toda vez dentro de uma função
+  g_timerElementCache = document.querySelector("#timeCounter");
+
+  g_timerDuration = <%= ((@auction.start_time + @auction.duration) - Time.now).to_i %>; 
+
+  g_refreshTimer = setInterval(function(){decreaseTimer()}, 1000);
+
+  App.timer.timekeeper();
+
 };
+
+function decreaseTimer(){
+  if (g_timerDuration <= 0){
+    clearInterval(g_refreshTimer);
+  } else {
+    g_timerDuration = g_timerDuration - 1;
+    g_timerElementCache.textContent = secondsToTime(g_timerDuration);
+  }
+}
+
+function secondsToTime(secs){
+  var seconds = secs % 60;
+  var minutes = (secs / 60) % 60;
+  var hours = (secs / 60) /60;
+
+  return (parseInt(hours) + "" ).padStart(2, "0") + ":" + (parseInt(minutes) + "" ).padStart(2, "0") + ":" + (parseInt(seconds) + "" ).padStart(2, "0")
+}
 
 
 function bidUpdate(data){
+
+
+  counter = document.querySelector("#bidsCounter");
+
+  counter.textContent = parseInt(counter.textContent) + 1; 
+  //bidsCounter
+
 
   // Atualiza o json jsTvShows, que contém dados de todos os programas
   // e reflete o modelo TvShow do servidor
@@ -273,25 +332,42 @@ function bidUpdate(data){
   };  
 
   // Atualiza os atributos da caixa do programa na seção "Acompanhe seus lances"
+
   var meuLance = document.querySelector("#meuLance_"+data["show_id"])
+
+  if (meuLance) {
+      
   meuLance.querySelector(".meuLanceUltimoLance").querySelector("p").textContent = "R$"+data["winning_bid1"].toPrecision(3);
 
-  if (data["user_id"] == <%= session["current_user_id"]%>){
-    meuLance.querySelector(".meuLanceSeuLance").querySelector("p").textContent = "R$"+data["winning_bid1"].toPrecision(3);
-  };
+      if (data["user_id"] == <%= session["current_user_id"]%>){
+        meuLance.querySelector(".meuLanceSeuLance").querySelector("p").textContent = "R$"+data["winning_bid1"].toPrecision(3);
+      };
 
     meuLance.querySelector(".meuLanceStatus").querySelector("p").textContent = returnStatus(data["show_id"]);
+
+  }
+
 
 
 
 }
 
-  function reload(){
-    localStorage.clear();
-    location.reload();
-  }
 
-  function instantiateMeuLance(show_id){
+function participantsUpdate(data){
+  console.log(data);
+  document.querySelector("#participantsCounter").textContent = data["count"]
+  //participantsCounter
+}
+
+
+function reload(){
+  localStorage.clear();
+  location.reload();
+}
+
+
+
+function instantiateMeuLance(show_id){
 
 
     var template = `<div id="meuLance_${show_id}" class="meuLanceContainer"> <div class="meuLanceBidButton">Aumentar seu lance</div> <h4>${ jsTvShows[show_id].name}</h4> <div class="meuLanceUltimoLance meuLanceInfoContainer"> <h5> Último Lance </h5> <p class="positiveValue">R$ ${parseFloat(jsTvShows[show_id].winning_bid1).toPrecision(3)} </p> </div> <div class="meuLanceSeuLance meuLanceInfoContainer"> <h5> Seu Lance </h5> <p class="positiveValue">R$ ${parseFloat(jsTvShows[show_id].winning_bid1).toPrecision(3) }</p> </div> <div class="meuLanceStatus meuLanceInfoContainer meuLanceLast"> <h5> Status </h5> <p class="positiveValue"> ${ returnStatus(show_id) } </p> </div> </div>`
@@ -318,8 +394,10 @@ function bidUpdate(data){
     }
 
     return status;
-  }
+}
+
+
+
 
 </script>
 
-<%= raw session.keys %>

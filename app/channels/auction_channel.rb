@@ -11,6 +11,11 @@ class AuctionChannel < ApplicationCable::Channel
   end
 
   def bid(data)
+    auction = Auction.first
+
+    auction.bid_counter = auction.bid_counter + 1
+    auction.save 
+
     show_id = data["message"]["show_id"]
     user_id = data["message"]["user_id"]
 

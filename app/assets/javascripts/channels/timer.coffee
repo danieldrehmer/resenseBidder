@@ -6,7 +6,9 @@ App.timer = App.cable.subscriptions.create "TimerChannel",
     # Called when the subscription has been terminated by the server
 
   received: (data) ->
-  	console.log data['message']
+  	console.log "Sincronizando relógio #{data['message']}"
+  	g_timerDuration = parseInt(data['message'])
+
 
   timekeeper: ->
     @perform 'timekeeper'

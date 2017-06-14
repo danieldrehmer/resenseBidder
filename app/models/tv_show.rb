@@ -4,6 +4,11 @@ class TvShow < ApplicationRecord
 	@@discount_factor = 2
 
 
+	def name
+		self[:name].titleize
+	end
+
+
 	def self.setTimes
 		# Use essa função pra ajudar a preencher os horarios dos programas no console. 
 		# Uma vez que você rodar ela, vai ter que preencher todos, de um a um, até o final.

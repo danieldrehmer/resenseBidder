@@ -5,6 +5,8 @@ class AuctionController < ApplicationController
 
   	@auction.active_users ||= []
 
+    @auction.start_time ||= Time.now
+
   	session[:current_user_id] ||= User.unique_random(@auction.active_users).id
 
   	@user = User.find(session[:current_user_id])
